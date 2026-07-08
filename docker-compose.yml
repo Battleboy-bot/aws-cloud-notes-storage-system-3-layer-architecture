@@ -1,0 +1,50 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    environment:
+      API_BASE_URL: http://localhost:5000/api/v1
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:80"
+    environment:
+      AWS_REGION: ${AWS_REGION:-ap-south-1}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: notes_db
+      DB_USER: notes_user
+      DB_PASSWORD: ${LOCAL_DB_PASSWORD}
+      DB_SSL: "false"
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
+      LOG_LEVEL: INFO
+      AWS_PROFILE: ${AWS_PROFILE:-default}
+    volumes:
+      - ${USERPROFILE}/.aws:/root/.aws:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: notes_db
+      MYSQL_USER: notes_user
+      MYSQL_PASSWORD: ${LOCAL_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${LOCAL_DB_ROOT_PASSWORD}
+    volumes:
+      - notes_mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  notes_mysql_data:

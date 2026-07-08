@@ -1,0 +1,128 @@
+openapi: "3.0.1"
+info:
+  title: "aws-cloud-notes-private-api"
+  version: "1.0.0"
+servers:
+  - url: "https://{api_id}.execute-api.{region}.amazonaws.com/api/v1"
+    variables:
+      api_id:
+        default: "replace-me"
+      region:
+        default: "ap-south-1"
+x-amazon-apigateway-endpoint-configuration:
+  types:
+    - PRIVATE
+x-amazon-apigateway-policy:
+  Version: "2012-10-17"
+  Statement:
+    - Effect: "Deny"
+      Principal: "*"
+      Action: "execute-api:Invoke"
+      Resource: "execute-api:/*"
+      Condition:
+        StringNotEquals:
+          aws:SourceVpce: "vpce-replace-me"
+    - Effect: "Allow"
+      Principal: "*"
+      Action: "execute-api:Invoke"
+      Resource: "execute-api:/*"
+paths:
+  /files:
+    get:
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "List files"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: "vpc-link-replace-me"
+        uri: "http://internal-notes-nlb-replace-me.elb.amazonaws.com/api/v1/files"
+        passthroughBehavior: when_no_match
+    post:
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: "Upload file"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: POST
+        connectionType: VPC_LINK
+        connectionId: "vpc-link-replace-me"
+        uri: "http://internal-notes-nlb-replace-me.elb.amazonaws.com/api/v1/files"
+        passthroughBehavior: when_no_match
+  /files/search:
+    get:
+      parameters:
+        - name: title
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Search files"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: "vpc-link-replace-me"
+        uri: "http://internal-notes-nlb-replace-me.elb.amazonaws.com/api/v1/files/search"
+        passthroughBehavior: when_no_match
+  /files/{identifier}:
+    get:
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Generate download URL"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: GET
+        connectionType: VPC_LINK
+        connectionId: "vpc-link-replace-me"
+        uri: "http://internal-notes-nlb-replace-me.elb.amazonaws.com/api/v1/files/{identifier}"
+        requestParameters:
+          integration.request.path.identifier: "method.request.path.identifier"
+        passthroughBehavior: when_no_match
+    delete:
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Delete file"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        httpMethod: DELETE
+        connectionType: VPC_LINK
+        connectionId: "vpc-link-replace-me"
+        uri: "http://internal-notes-nlb-replace-me.elb.amazonaws.com/api/v1/files/{identifier}"
+        requestParameters:
+          integration.request.path.identifier: "method.request.path.identifier"
+        passthroughBehavior: when_no_match
