@@ -65,6 +65,7 @@ aws-cloud-notes-storage-system/
       middleware/
       utils/
   database/schema.sql
+  database/Dockerfile
   docs/aws/
   docker-compose.yml
   .env.example
