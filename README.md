@@ -173,6 +173,8 @@ docker run -d --name notes-backend -p 80:80 \
 
 Full details are in `docs/aws/deployment-guide.md`.
 
+For the exact three-instance AWS deployment path, use `docs/aws/three-instance-aws-deployment.md`.
+
 ## Security Notes
 
 - No database passwords or AWS credentials are stored in `config.py`, `app.py`, Dockerfiles, or GitHub.
