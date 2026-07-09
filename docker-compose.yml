@@ -1,5 +1,6 @@
 services:
   frontend:
+    container_name: notes-frontend
     build: ./frontend
     ports:
       - "8080:80"
@@ -9,6 +10,7 @@ services:
       - backend
 
   backend:
+    container_name: notes-backend
     build: ./backend
     ports:
       - "5000:80"
@@ -31,6 +33,7 @@ services:
         condition: service_healthy
 
   mysql:
+    container_name: notes-database
     build: ./database
     environment:
       MYSQL_DATABASE: notes_db
